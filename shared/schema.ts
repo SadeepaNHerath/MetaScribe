@@ -49,6 +49,7 @@ export type Recommendation = {
 };
 
 export type SeoAnalysisData = {
+  createdAt: any;
   url: string;
   metaTags: MetaTag[];
   scores: {
@@ -56,6 +57,7 @@ export type SeoAnalysisData = {
     requiredTags: number;
     socialTags: number;
     bestPractices: number;
+    createdAt: string;
   };
   recommendations: Recommendation[];
   rawHtml?: string;

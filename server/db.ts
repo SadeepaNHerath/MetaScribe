@@ -1,15 +1,23 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+import type { SeoAnalysis, SeoAnalysisData } from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+class InMemoryStorage {
+  private seoAnalyses: Map<string, SeoAnalysisData> = new Map();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  storeAnalysis(url: string, data: SeoAnalysisData): void {
+    this.seoAnalyses.set(url, data);
+  }
+
+  getAnalysisByUrl(url: string): SeoAnalysisData | null {
+    return this.seoAnalyses.get(url) || null;
+  }
+
+  getAllAnalyses(): SeoAnalysisData[] {
+    return Array.from(this.seoAnalyses.values());
+  }
+
+  clear(): void {
+    this.seoAnalyses.clear();
+  }
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+export const storage = new InMemoryStorage();

@@ -3,7 +3,6 @@ import * as cheerio from "cheerio";
 import type { MetaTag, Recommendation, SeoAnalysisData } from "@shared/schema";
 
 export async function analyzeSeo(url: string): Promise<SeoAnalysisData> {
-  // Ensure URL has http/https protocol
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
     url = `https://${url}`;
   }
@@ -19,22 +18,22 @@ export async function analyzeSeo(url: string): Promise<SeoAnalysisData> {
     const html = response.data;
     const $ = cheerio.load(html);
     
-    // Extract meta tags
     const metaTags = extractMetaTags($);
     
-    // Analyze meta tags and generate scores
-    const scores = generateScores(metaTags);
+    const scores = {
+      ...generateScores(metaTags),
+      createdAt: new Date().toISOString()
+    };
     
-    // Generate recommendations
     const recommendations = generateRecommendations(metaTags, url);
     
-    // Extract head section for raw HTML display
     const headHtml = $.html($('head'));
     
     return {
       url,
       metaTags,
       scores,
+      createdAt: new Date().toISOString(),
       recommendations,
       rawHtml: headHtml
     };
@@ -79,7 +78,6 @@ function extractMetaTags($: cheerio.CheerioAPI): MetaTag[] {
     status: viewport ? 'present' : 'missing'
   });
   
-  // Extract robots
   const robots = $('meta[name="robots"]').attr('content');
   metaTags.push({
     name: 'robots',
@@ -87,7 +85,6 @@ function extractMetaTags($: cheerio.CheerioAPI): MetaTag[] {
     status: robots ? 'present' : 'warning'
   });
   
-  // Extract canonical
   const canonical = $('link[rel="canonical"]').attr('href');
   metaTags.push({
     name: 'canonical',
@@ -95,7 +92,6 @@ function extractMetaTags($: cheerio.CheerioAPI): MetaTag[] {
     status: canonical ? 'present' : 'warning'
   });
   
-  // Extract Open Graph tags
   const ogTitle = $('meta[property="og:title"]').attr('content');
   metaTags.push({
     name: 'og:title',
@@ -197,36 +193,29 @@ function generateScores(metaTags: MetaTag[]): {
   socialTags: number;
   bestPractices: number;
 } {
-  // Required tags: title, description, viewport
   const requiredTags = ['title', 'description', 'viewport'];
   const requiredCount = requiredTags.filter(name => 
     metaTags.find(tag => tag.name === name && tag.status === 'present')
   ).length;
   const requiredScore = Math.round((requiredCount / requiredTags.length) * 100);
   
-  // Social tags: og:title, og:description, og:image, og:url, og:type, twitter:card, twitter:title, twitter:description, twitter:image
   const socialTags = ['og:title', 'og:description', 'og:image', 'og:url', 'og:type', 'twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'];
   const socialCount = socialTags.filter(name => 
     metaTags.find(tag => tag.name === name && tag.status === 'present')
   ).length;
   const socialScore = Math.round((socialCount / socialTags.length) * 100);
   
-  // Best practices: robots, canonical, language, title length, description length
   let bestPracticesScore = 0;
   
-  // Check robots
   const robotsTag = metaTags.find(tag => tag.name === 'robots');
   if (robotsTag && robotsTag.status === 'present') bestPracticesScore += 20;
   
-  // Check canonical
   const canonicalTag = metaTags.find(tag => tag.name === 'canonical');
   if (canonicalTag && canonicalTag.status === 'present') bestPracticesScore += 20;
   
-  // Check language
   const languageTag = metaTags.find(tag => tag.name === 'language');
   if (languageTag && languageTag.status === 'present') bestPracticesScore += 20;
   
-  // Check title length (50-60 chars)
   const titleTag = metaTags.find(tag => tag.name === 'title');
   if (titleTag && titleTag.content) {
     const titleLength = titleTag.content.length;
@@ -234,7 +223,6 @@ function generateScores(metaTags: MetaTag[]): {
     else if (titleLength > 0) bestPracticesScore += 10;
   }
   
-  // Check description length (120-155 chars)
   const descriptionTag = metaTags.find(tag => tag.name === 'description');
   if (descriptionTag && descriptionTag.content) {
     const descLength = descriptionTag.content.length;
@@ -242,8 +230,6 @@ function generateScores(metaTags: MetaTag[]): {
     else if (descLength > 0) bestPracticesScore += 10;
   }
   
-  // Calculate overall score with weighted average:
-  // Required tags (40%), Social tags (30%), Best practices (30%)
   const overall = Math.round(
     (requiredScore * 0.4) + (socialScore * 0.3) + (bestPracticesScore * 0.3)
   );

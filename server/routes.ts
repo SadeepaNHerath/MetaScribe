@@ -14,11 +14,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { url } = urlSchema.parse({ url: req.query.url });
       
-      // First check if we have a recent analysis for this URL
       const cachedAnalysis = await storage.getSeoAnalysisByUrl(url);
       
-      if (cachedAnalysis) {
-        // Return the cached analysis if it exists and is recent (less than 1 hour old)
+      if (cachedAnalysis && cachedAnalysis.createdAt) {
         const cacheAge = Date.now() - cachedAnalysis.createdAt.getTime();
         if (cacheAge < 3600000) { // 1 hour in milliseconds
           return res.json({
@@ -30,15 +28,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // If no recent cache, perform a new analysis
       const analysis = await analyzeSeo(url);
       
-      // Store the analysis results
       const seoAnalysis = await storage.createSeoAnalysis({
         url,
         metaTags: analysis.metaTags,
         scores: analysis.scores,
         recommendations: analysis.recommendations,
+        createdAt: new Date(),
       });
       
       return res.json(analysis);

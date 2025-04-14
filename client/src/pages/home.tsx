@@ -21,10 +21,21 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 text-textDark">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <AppHeader />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
-        <UrlInput onSubmit={handleSubmit} isLoading={isLoading} />
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        <div className="max-w-3xl mx-auto mb-10 text-center">
+          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl mb-3">
+            Meta<span className="text-primary">Scribe</span>
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Analyze and optimize your website's SEO with powerful insights
+          </p>
+        </div>
+        
+        <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-8">
+          <UrlInput onSubmit={handleSubmit} isLoading={isLoading} />
+        </div>
         
         {isSubmitted && (
           <ResultsSection 

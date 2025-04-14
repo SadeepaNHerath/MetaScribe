@@ -58,13 +58,17 @@ export function ScoreOverview({ scores }: ScoreProps) {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {scoreCategories.map((category) => (
-          <Card key={category.name} className="overflow-hidden">
-            <CardHeader className={`${getBgColorForScore(category.color)} p-4`}>
+          <Card 
+            key={category.name} 
+            className="overflow-hidden border-t-4 hover:shadow-lg transition-shadow duration-300"
+            style={{ borderTopColor: getCategoryBorderColor(category.color) }}
+          >
+            <CardHeader className={`p-4`}>
               <div className="flex justify-between items-center">
-                <div className="text-white">
+                <div className={`${category.color}`}>
                   {category.icon}
                 </div>
-                <div className="text-3xl font-bold text-white">
+                <div className="text-3xl font-bold">
                   {category.value}%
                 </div>
               </div>
@@ -75,9 +79,9 @@ export function ScoreOverview({ scores }: ScoreProps) {
                 {getStatusIcon(category.status)}
               </div>
               <p className="text-sm text-muted-foreground">{category.description}</p>
-              <div className="w-full bg-secondary/20 rounded-full h-2 mt-4">
+              <div className="w-full bg-secondary/20 rounded-full h-2 mt-4" role="progressbar" aria-valuenow={category.value} aria-valuemin={0} aria-valuemax={100}>
                 <div
-                  className={`${getProgressColor(category.color)} rounded-full h-2`}
+                  className={`${getProgressColor(category.color)} rounded-full h-2 transition-all duration-500 ease-in-out`}
                   style={{ width: `${category.value}%` }}
                 ></div>
               </div>
@@ -148,5 +152,21 @@ function getStatusIcon(status: 'excellent' | 'good' | 'fair' | 'poor') {
       return <AlertCircle className="h-4 w-4 ml-2 text-error" />;
     default:
       return null;
+  }
+}
+
+// Add this new helper function
+function getCategoryBorderColor(textColor: string): string {
+  switch (textColor) {
+    case "text-secondary":
+      return "hsl(var(--secondary))";
+    case "text-primary":
+      return "hsl(var(--primary))";
+    case "text-warning":
+      return "hsl(var(--warning))";
+    case "text-error":
+      return "hsl(var(--error))";
+    default:
+      return "hsl(var(--primary))";
   }
 }

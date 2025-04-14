@@ -35,7 +35,7 @@ export function UrlInput({ onSubmit, isLoading }: UrlInputProps) {
   };
 
   return (
-    <section className="bg-white rounded-lg shadow-md p-6 mb-8">
+    <section className="bg-background rounded-lg shadow-md p-6 mb-8">
       <h2 className="text-2xl font-semibold mb-4">Analyze Website Meta Tags</h2>
       <p className="text-gray-600 mb-6">
         Enter a URL to analyze its meta tags, view search and social media previews, and get SEO recommendations.

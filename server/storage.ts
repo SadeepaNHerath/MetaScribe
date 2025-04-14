@@ -1,15 +1,11 @@
 import { 
-  users, 
-  seoAnalyses, 
   type User, 
   type InsertUser, 
   type SeoAnalysis, 
   type InsertSeoAnalysis, 
-  type MetaTag, 
-  type Recommendation 
+  type SeoAnalysisData 
 } from "@shared/schema";
-import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { storage as memoryStorage } from "./db";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -17,55 +13,49 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   
   getSeoAnalysis(id: number): Promise<SeoAnalysis | undefined>;
-  getSeoAnalysisByUrl(url: string): Promise<SeoAnalysis | undefined>;
-  createSeoAnalysis(analysis: InsertSeoAnalysis): Promise<SeoAnalysis>;
-  getRecentAnalyses(limit: number): Promise<SeoAnalysis[]>;
+  getSeoAnalysisByUrl(url: string): Promise<SeoAnalysisData | null>;
+  createSeoAnalysis(analysis: SeoAnalysisData): Promise<void>;
+  getRecentAnalyses(limit: number): Promise<SeoAnalysisData[]>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class InMemoryDatabaseStorage implements IStorage {
+  private users: Map<number, User> = new Map();
+  private userIdCounter = 1;
+  private usersByUsername: Map<string, User> = new Map();
+  private analysisIdCounter = 1;
+
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return this.users.get(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    return this.usersByUsername.get(username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const id = this.userIdCounter++;
+    const user = { ...insertUser, id };
+    this.users.set(id, user);
+    this.usersByUsername.set(insertUser.username, user);
     return user;
   }
   
   async getSeoAnalysis(id: number): Promise<SeoAnalysis | undefined> {
-    const [analysis] = await db.select().from(seoAnalyses).where(eq(seoAnalyses.id, id));
-    return analysis || undefined;
+    return undefined;
   }
   
-  async getSeoAnalysisByUrl(url: string): Promise<SeoAnalysis | undefined> {
-    const [analysis] = await db.select().from(seoAnalyses).where(eq(seoAnalyses.url, url));
-    return analysis || undefined;
+  async getSeoAnalysisByUrl(url: string): Promise<SeoAnalysisData | null> {
+    return memoryStorage.getAnalysisByUrl(url);
   }
   
-  async createSeoAnalysis(insertAnalysis: InsertSeoAnalysis): Promise<SeoAnalysis> {
-    const [analysis] = await db
-      .insert(seoAnalyses)
-      .values(insertAnalysis)
-      .returning();
-    return analysis;
+  async createSeoAnalysis(analysis: SeoAnalysisData): Promise<void> {
+    memoryStorage.storeAnalysis(analysis.url, analysis);
   }
   
-  async getRecentAnalyses(limit: number): Promise<SeoAnalysis[]> {
-    return await db
-      .select()
-      .from(seoAnalyses)
-      .orderBy(desc(seoAnalyses.createdAt))
-      .limit(limit);
+  async getRecentAnalyses(limit: number): Promise<SeoAnalysisData[]> {
+    const allAnalyses = memoryStorage.getAllAnalyses();
+    return allAnalyses.slice(0, limit);
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new InMemoryDatabaseStorage();
