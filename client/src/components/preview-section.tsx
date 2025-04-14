@@ -102,7 +102,7 @@ export function PreviewSection({ metaTags, url }: PreviewSectionProps) {
               ) : (
                 <AlertTriangle className="text-warning text-sm mr-1 h-4 w-4" />
               )}
-              {twitterImage ? "Twitter image meta tag present" : "Missing twitter:image meta tag"}
+              {twitterImage ? "X/Twitter image meta tag present" : "Missing twitter:image meta tag"}
             </div>
           </div>
         </CardContent>
