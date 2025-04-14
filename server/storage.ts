@@ -8,6 +8,8 @@ import {
   type MetaTag, 
   type Recommendation 
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -20,63 +22,50 @@ export interface IStorage {
   getRecentAnalyses(limit: number): Promise<SeoAnalysis[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private seoAnalyses: Map<number, SeoAnalysis>;
-  userCurrentId: number;
-  analysisCurrentId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.seoAnalyses = new Map();
-    this.userCurrentId = 1;
-    this.analysisCurrentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
   
   async getSeoAnalysis(id: number): Promise<SeoAnalysis | undefined> {
-    return this.seoAnalyses.get(id);
+    const [analysis] = await db.select().from(seoAnalyses).where(eq(seoAnalyses.id, id));
+    return analysis || undefined;
   }
   
   async getSeoAnalysisByUrl(url: string): Promise<SeoAnalysis | undefined> {
-    return Array.from(this.seoAnalyses.values()).find(
-      (analysis) => analysis.url === url,
-    );
+    const [analysis] = await db.select().from(seoAnalyses).where(eq(seoAnalyses.url, url));
+    return analysis || undefined;
   }
   
   async createSeoAnalysis(insertAnalysis: InsertSeoAnalysis): Promise<SeoAnalysis> {
-    const id = this.analysisCurrentId++;
-    const now = new Date();
-    const analysis: SeoAnalysis = { 
-      ...insertAnalysis, 
-      id, 
-      createdAt: now 
-    };
-    this.seoAnalyses.set(id, analysis);
+    const [analysis] = await db
+      .insert(seoAnalyses)
+      .values(insertAnalysis)
+      .returning();
     return analysis;
   }
   
   async getRecentAnalyses(limit: number): Promise<SeoAnalysis[]> {
-    return Array.from(this.seoAnalyses.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, limit);
+    return await db
+      .select()
+      .from(seoAnalyses)
+      .orderBy(desc(seoAnalyses.createdAt))
+      .limit(limit);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
