@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, Lightbulb, Copy, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Code, Lightbulb, Copy, Check, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import type { MetaTag, Recommendation } from "@shared/schema";
