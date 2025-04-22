@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import { AppHeader } from "@/components/app-header";
 
 function Router() {
   return (
@@ -21,8 +22,11 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="seo-analyzer-theme">
       <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
+        <>
+          <AppHeader />
+          <Router />
+          <Toaster />
+        </>
       </QueryClientProvider>
     </ThemeProvider>
   );
