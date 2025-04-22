@@ -8,11 +8,13 @@
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#1f2937" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Add base URL tag to help with client-side routing -->
+    <base href="/" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
-    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+    <!-- Remove the replit script in production to avoid potential issues -->
+    <!-- <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script> -->
   </body>
 </html>
