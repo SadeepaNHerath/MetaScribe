@@ -17,14 +17,16 @@ MetaScribe analyzes web content to provide actionable SEO insights and recommend
 
 - **Frontend**: React with TypeScript, Tailwind CSS
 - **Backend**: Node.js
-- **Database**: In-memory storage (PostgreSQL planned for future implementation)
+- **Serverless API**: Vercel Functions
+- **Storage**: In-memory storage (PostgreSQL planned for future implementation)
 - **Build Tools**: Vite
 - **ORM**: Drizzle (for future PostgreSQL implementation)
 
 ## 🏗️ Project Structure
 
 - `client/` - Frontend React application
-- `server/` - Backend Node.js API
+- `server/` - Backend Node.js API (for local development)
+- `api/` - Serverless API functions for Vercel deployment
 - `shared/` - Shared types and schemas
 
 ## 🚦 Getting Started
@@ -94,6 +96,29 @@ MetaScribe analyzes web content to provide actionable SEO insights and recommend
   ```
 
 The application will be available at [http://localhost:5000](http://localhost:5000)
+
+## 🌐 Deployment
+
+### Vercel Deployment
+
+The application is configured for deployment on Vercel with serverless API functions.
+
+1. Make sure your Vercel account is set up and connected to your GitHub repository
+2. Deploy using the Vercel CLI or GitHub integration:
+   ```bash
+   vercel
+   ```
+
+3. The deployment uses:
+   - Static site hosting for the React frontend
+   - Serverless functions for the API endpoints
+
+### API Architecture
+
+- **Local Development**: Uses Express server in `server/` directory
+- **Production**: Uses serverless functions in `api/` directory
+- **Storage**: Currently in-memory (non-persistent in production)
+- **Routes**: Main endpoint is `/api/analyze` for SEO analysis
 
 ## 📝 License
 
