@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AppHeader } from "@/components/app-header";
 import { AppFooter } from "@/components/app-footer";
 import { UrlInput } from "@/components/url-input";
 import { ResultsSection } from "@/components/results-section";
@@ -22,7 +21,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <AppHeader />
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         <div className="max-w-3xl mx-auto mb-10 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl mb-3">
