@@ -136,44 +136,110 @@ function extractMetaTags($) {
     status: ogImage ? 'present' : 'warning'
   });
   
+  // Extract Twitter Card tags
+  const twitterCard = $('meta[name="twitter:card"]').attr('content');
+  metaTags.push({
+    name: 'twitter:card',
+    content: twitterCard || '',
+    status: twitterCard ? 'present' : 'warning'
+  });
+  
+  const twitterTitle = $('meta[name="twitter:title"]').attr('content');
+  metaTags.push({
+    name: 'twitter:title',
+    content: twitterTitle || '',
+    status: twitterTitle ? 'present' : 'warning'
+  });
+  
+  const twitterDescription = $('meta[name="twitter:description"]').attr('content');
+  metaTags.push({
+    name: 'twitter:description',
+    content: twitterDescription || '',
+    status: twitterDescription ? 'present' : 'warning'
+  });
+  
+  const twitterImage = $('meta[name="twitter:image"]').attr('content');
+  metaTags.push({
+    name: 'twitter:image',
+    content: twitterImage || '',
+    status: twitterImage ? 'present' : 'warning'
+  });
+  
+  // Additional OG tags
+  const ogUrl = $('meta[property="og:url"]').attr('content');
+  metaTags.push({
+    name: 'og:url',
+    content: ogUrl || '',
+    status: ogUrl ? 'present' : 'warning'
+  });
+  
+  const ogType = $('meta[property="og:type"]').attr('content');
+  metaTags.push({
+    name: 'og:type',
+    content: ogType || '',
+    status: ogType ? 'present' : 'warning'
+  });
+  
+  // Language tag
+  const language = $('html').attr('lang');
+  if (language) {
+    metaTags.push({
+      name: 'language',
+      content: language,
+      status: 'present'
+    });
+  }
+  
   return metaTags;
 }
 
 function generateScores(metaTags) {
-  // A simplified version of your scoring function
-  let requiredTags = 0;
-  let socialTags = 0;
-  let bestPractices = 0;
-  
-  // Required tags (title, description, viewport)
-  const requiredTagList = ['title', 'description', 'viewport'];
-  const requiredTagsPresent = metaTags.filter(tag => 
-    requiredTagList.includes(tag.name) && tag.status === 'present'
+  const requiredTags = ['title', 'description', 'viewport'];
+  const requiredCount = requiredTags.filter(name => 
+    metaTags.find(tag => tag.name === name && tag.status === 'present')
   ).length;
-  requiredTags = (requiredTagsPresent / requiredTagList.length) * 100;
+  const requiredScore = Math.round((requiredCount / requiredTags.length) * 100);
   
-  // Social tags (og:title, og:description, og:image)
-  const socialTagList = ['og:title', 'og:description', 'og:image'];
-  const socialTagsPresent = metaTags.filter(tag => 
-    socialTagList.includes(tag.name) && tag.status === 'present'
+  const socialTags = ['og:title', 'og:description', 'og:image', 'og:url', 'og:type', 'twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'];
+  const socialCount = socialTags.filter(name => 
+    metaTags.find(tag => tag.name === name && tag.status === 'present')
   ).length;
-  socialTags = (socialTagsPresent / socialTagList.length) * 100;
+  const socialScore = Math.round((socialCount / socialTags.length) * 100);
   
-  // Best practices (canonical, robots)
-  const bestPracticesList = ['canonical', 'robots'];
-  const bestPracticesPresent = metaTags.filter(tag => 
-    bestPracticesList.includes(tag.name) && tag.status === 'present'
-  ).length;
-  bestPractices = (bestPracticesPresent / bestPracticesList.length) * 100;
+  let bestPracticesScore = 0;
   
-  // Calculate overall score (weighted average)
-  const overall = (requiredTags * 0.5) + (socialTags * 0.3) + (bestPractices * 0.2);
+  const robotsTag = metaTags.find(tag => tag.name === 'robots');
+  if (robotsTag && robotsTag.status === 'present') bestPracticesScore += 20;
+  
+  const canonicalTag = metaTags.find(tag => tag.name === 'canonical');
+  if (canonicalTag && canonicalTag.status === 'present') bestPracticesScore += 20;
+  
+  const languageTag = metaTags.find(tag => tag.name === 'language');
+  if (languageTag && languageTag.status === 'present') bestPracticesScore += 20;
+  
+  const titleTag = metaTags.find(tag => tag.name === 'title');
+  if (titleTag && titleTag.content) {
+    const titleLength = titleTag.content.length;
+    if (titleLength >= 10 && titleLength <= 60) bestPracticesScore += 20;
+    else if (titleLength > 0) bestPracticesScore += 10;
+  }
+  
+  const descriptionTag = metaTags.find(tag => tag.name === 'description');
+  if (descriptionTag && descriptionTag.content) {
+    const descLength = descriptionTag.content.length;
+    if (descLength >= 70 && descLength <= 155) bestPracticesScore += 20;
+    else if (descLength > 0) bestPracticesScore += 10;
+  }
+  
+  const overall = Math.round(
+    (requiredScore * 0.4) + (socialScore * 0.3) + (bestPracticesScore * 0.3)
+  );
   
   return {
-    overall: Math.round(overall),
-    requiredTags: Math.round(requiredTags),
-    socialTags: Math.round(socialTags),
-    bestPractices: Math.round(bestPractices),
+    overall,
+    requiredTags: requiredScore,
+    socialTags: socialScore,
+    bestPractices: bestPracticesScore,
     createdAt: new Date().toISOString()
   };
 }
