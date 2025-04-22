@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --border: 210 40% 96.1%;
+    /* Other CSS variables can remain */
+  }
+
   * {
-    @apply border-border;
+    @apply border-[hsl(var(--border))];
   }
 
   body {

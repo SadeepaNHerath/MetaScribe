@@ -5,9 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
-import { useIsMobile } from "./hooks/use-mobile";
 
-// Use static routing for better compatibility with static hosting
 function Router() {
   return (
     <WouterRouter base="">
@@ -20,9 +18,6 @@ function Router() {
 }
 
 function App() {
-  // Initialize mobile detection early
-  useIsMobile();
-  
   return (
     <ThemeProvider defaultTheme="system" storageKey="seo-analyzer-theme">
       <QueryClientProvider client={queryClient}>
