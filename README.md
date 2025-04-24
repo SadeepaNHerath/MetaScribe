@@ -8,15 +8,20 @@ MetaScribe analyzes web content to provide actionable SEO insights and recommend
 
 ## 🚀 Features
 
-- **SEO Analysis**: Comprehensive analysis of content for search engine optimization
-- **Score Overview**: Quick view of your content's SEO performance
-- **Detailed Reports**: In-depth analysis of your content with actionable recommendations
-- **Content Preview**: See how your content might appear in search results
+- **SEO Analysis**: Comprehensive analysis of meta tags with scoring in multiple categories:
+  - Required Tags (title, description, viewport)
+  - Social Media Tags (Open Graph, Twitter Cards)
+  - SEO Best Practices (canonical URLs, language settings, robots)
+- **Score Overview**: Visual scoring dashboard with 0-100 ratings for each category
+- **Detailed Reports**: In-depth analysis of meta tags with specific recommendations and code snippets
+- **Content Preview**: Visual previews of how content appears in search results and social media platforms
+- **Raw HTML Analysis**: View and copy raw meta tag HTML from analyzed pages
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React with TypeScript, Tailwind CSS
 - **Backend**: Node.js
+- **UI Components**: Custom components built with Radix UI and shadcn/ui
 - **Serverless API**: Vercel Functions
 - **Storage**: In-memory storage (PostgreSQL planned for future implementation)
 - **Build Tools**: Vite
@@ -28,6 +33,30 @@ MetaScribe analyzes web content to provide actionable SEO insights and recommend
 - `server/` - Backend Node.js API (for local development)
 - `api/` - Serverless API functions for Vercel deployment
 - `shared/` - Shared types and schemas
+
+## ✅ Meta Tags Analyzed
+
+MetaScribe analyzes the following meta tags and HTML elements:
+
+- **Essential Tags**:
+  - `<title>` - Page title
+  - `<meta name="description">` - Page description
+  - `<meta name="viewport">` - Mobile viewport settings
+
+- **Social Media Tags**:
+  - Open Graph: `og:title`, `og:description`, `og:image`, `og:url`, `og:type`
+  - Twitter Cards: `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`
+
+- **SEO Best Practices**:
+  - `<link rel="canonical">` - Canonical URL
+  - `<meta name="robots">` - Robots directives
+  - `<html lang="">` - Language declaration
+  - Optimal content lengths for titles and descriptions
+
+## 📸 Screenshots
+
+### Analysis Dashboard
+
 
 ## 🚦 Getting Started
 
