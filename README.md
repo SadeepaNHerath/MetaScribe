@@ -55,8 +55,11 @@ MetaScribe analyzes the following meta tags and HTML elements:
 
 ## 📸 Screenshots
 
-### Analysis Dashboard
+### Analysis Dashboard light mod
+![screencapture-localhost-5000-2025-04-14-20_41_41](https://github.com/user-attachments/assets/d4bbdc19-d8be-4046-868d-1dc3489a43a9)
 
+### Analysis Dashboard dark mod
+![screencapture-localhost-5000-2025-04-14-20_41_21](https://github.com/user-attachments/assets/8a1bfae2-2300-4461-b94a-81f93e6060b1)
 
 ## 🚦 Getting Started
 
