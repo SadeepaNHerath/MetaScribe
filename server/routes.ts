@@ -48,9 +48,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Invalid URL format. Please provide a valid URL." 
         });
       }
+
+      if (error instanceof Error) {
+        const message = error.message;
+
+        if (
+          message.includes("Request timeout") ||
+          message.includes("ECONNABORTED") ||
+          message.includes("ETIMEDOUT")
+        ) {
+          return res.status(504).json({ message });
+        }
+
+        if (
+          message.includes("Access forbidden (403)") ||
+          message.includes("Page not found (404)") ||
+          message.includes("Website not found") ||
+          message.includes("Connection refused") ||
+          message.includes("Server error (") ||
+          message.includes("Received ")
+        ) {
+          return res.status(502).json({ message });
+        }
+
+        return res.status(400).json({ message });
+      }
       
       return res.status(500).json({ 
-        message: error instanceof Error ? error.message : "Failed to analyze the URL" 
+        message: "Failed to analyze the URL" 
       });
     }
   });
