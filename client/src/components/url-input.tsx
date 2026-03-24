@@ -28,53 +28,60 @@ export function UrlInput({ onSubmit, isLoading }: UrlInputProps) {
 
   const handleSubmit = (values: UrlFormValues) => {
     let formattedUrl = values.url;
-    if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+    if (
+      !formattedUrl.startsWith("http://") &&
+      !formattedUrl.startsWith("https://")
+    ) {
       formattedUrl = `https://${formattedUrl}`;
     }
     onSubmit(formattedUrl);
   };
 
   return (
-    <section className="bg-background rounded-lg shadow-md p-6 mb-8">
+    <section>
       <h2 className="text-2xl font-semibold mb-4">Analyze Website Meta Tags</h2>
-      <p className="text-gray-600 mb-6">
-        Enter a URL to analyze its meta tags, view search and social media previews, and get SEO recommendations.
+      <p className="text-muted-foreground mb-6">
+        Enter a URL to analyze its meta tags, view search and social media
+        previews, and get SEO recommendations.
       </p>
-      
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col md:flex-row gap-4">
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="flex flex-col md:flex-row md:items-start gap-3"
+        >
           <FormField
             control={form.control}
             name="url"
             render={({ field }) => (
               <FormItem className="flex-grow">
                 <FormControl>
-                  <Input 
-                    placeholder="https://example.com" 
-                    className="w-full px-4 py-6 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  <Input
+                    placeholder="https://example.com"
+                    className="h-12"
                     {...field}
                   />
                 </FormControl>
               </FormItem>
             )}
           />
-          
-          <Button 
-            type="submit" 
-            className="bg-primary hover:bg-primary/90 text-white font-medium py-6 px-6 h-auto"
+
+          <Button
+            type="submit"
+            className="h-12 px-6 md:self-start"
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Search className="mr-2 h-5 w-5" />
+              <Search className="mr-2 h-4 w-4" />
             )}
             Analyze
           </Button>
         </form>
       </Form>
-      
-      <div className="mt-4 text-sm text-gray-500">
+
+      <div className="mt-4 text-sm text-muted-foreground">
         Example URLs: techcrunch.com, nytimes.com, github.com
       </div>
     </section>

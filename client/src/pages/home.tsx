@@ -9,8 +9,14 @@ export default function Home() {
   const [url, setUrl] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const { data: analysisData, isLoading, error } = useQuery<SeoAnalysisData>({
-    queryKey: isSubmitted ? [`/api/analyze?url=${encodeURIComponent(url)}`] : [],
+  const {
+    data: analysisData,
+    isLoading,
+    error,
+  } = useQuery<SeoAnalysisData>({
+    queryKey: isSubmitted
+      ? [`/api/analyze?url=${encodeURIComponent(url)}`]
+      : [],
     enabled: isSubmitted && !!url,
   });
 
@@ -30,16 +36,16 @@ export default function Home() {
             Analyze and optimize your website's SEO with powerful insights
           </p>
         </div>
-        
+
         <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-8">
           <UrlInput onSubmit={handleSubmit} isLoading={isLoading} />
         </div>
-        
+
         {isSubmitted && (
-          <ResultsSection 
-            analysisData={analysisData} 
-            isLoading={isLoading} 
-            error={error as Error | null} 
+          <ResultsSection
+            analysisData={analysisData}
+            isLoading={isLoading}
+            error={error as Error | null}
             url={url}
           />
         )}
