@@ -1,7 +1,23 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { CheckCircle, AlertCircle, AlertTriangle, Globe, Share2, BookCheck } from "lucide-react";
+import {
+  CheckCircle,
+  AlertCircle,
+  AlertTriangle,
+  Globe,
+  Share2,
+  BookCheck,
+  FileCode,
+  FileText,
+} from "lucide-react";
 
 interface ScoreProps {
   scores: {
@@ -9,6 +25,8 @@ interface ScoreProps {
     requiredTags: number;
     socialTags: number;
     bestPractices: number;
+    contentQuality?: number;
+    structuredData?: number;
   };
 }
 
@@ -19,9 +37,10 @@ export function ScoreOverview({ scores }: ScoreProps) {
       value: scores.overall,
       color: getColorForScore(scores.overall),
       icon: <Globe className="h-6 w-6" />,
-      description: "Your overall SEO health score based on all meta tag categories",
+      description:
+        "Your overall SEO health score based on all meta tag categories",
       status: getScoreStatus(scores.overall),
-      tips: "This score represents the overall health of your meta tags implementation."
+      tips: "This score represents the overall health of your meta tags implementation.",
     },
     {
       name: "Required Tags",
@@ -30,7 +49,7 @@ export function ScoreOverview({ scores }: ScoreProps) {
       icon: <CheckCircle className="h-6 w-6" />,
       description: "Essential meta tags like title, description, and viewport",
       status: getScoreStatus(scores.requiredTags),
-      tips: "These tags are crucial for search engines to understand and rank your page properly."
+      tips: "These tags are crucial for search engines to understand and rank your page properly.",
     },
     {
       name: "Social Tags",
@@ -39,38 +58,66 @@ export function ScoreOverview({ scores }: ScoreProps) {
       icon: <Share2 className="h-6 w-6" />,
       description: "Open Graph and Twitter Card tags for social media sharing",
       status: getScoreStatus(scores.socialTags),
-      tips: "These tags control how your content appears when shared on social platforms."
+      tips: "These tags control how your content appears when shared on social platforms.",
     },
     {
       name: "Best Practices",
       value: scores.bestPractices,
       color: getColorForScore(scores.bestPractices),
       icon: <BookCheck className="h-6 w-6" />,
-      description: "SEO best practices like robots, canonical, and language tags",
+      description:
+        "SEO best practices like robots, canonical, and language tags",
       status: getScoreStatus(scores.bestPractices),
-      tips: "Following these practices helps search engines index your content properly."
+      tips: "Following these practices helps search engines index your content properly.",
     },
   ];
+
+  // Add Phase 2 categories if scores are available
+  if (scores.contentQuality !== undefined) {
+    scoreCategories.push({
+      name: "Content Quality",
+      value: scores.contentQuality,
+      color: getColorForScore(scores.contentQuality),
+      icon: <FileText className="h-6 w-6" />,
+      description: "Heading structure, image alt text, and content depth",
+      status: getScoreStatus(scores.contentQuality),
+      tips: "Quality content with proper structure helps both users and search engines.",
+    });
+  }
+
+  if (scores.structuredData !== undefined) {
+    scoreCategories.push({
+      name: "Structured Data",
+      value: scores.structuredData,
+      color: getColorForScore(scores.structuredData),
+      icon: <FileCode className="h-6 w-6" />,
+      description: "JSON-LD schema markup for rich search results",
+      status: getScoreStatus(scores.structuredData),
+      tips: "Structured data enables rich snippets and enhanced search results.",
+    });
+  }
+
+  // Determine grid columns based on number of categories
+  const gridCols =
+    scoreCategories.length <= 4
+      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+      : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6";
 
   return (
     <section className="bg-card rounded-lg shadow-md p-6 mb-8">
       <h3 className="text-xl font-semibold mb-4">SEO Tag Health Score</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <div className={`grid ${gridCols} gap-6`}>
         {scoreCategories.map((category) => (
-          <Card 
-            key={category.name} 
+          <Card
+            key={category.name}
             className="overflow-hidden border-t-4 hover:shadow-lg transition-shadow duration-300"
             style={{ borderTopColor: getCategoryBorderColor(category.color) }}
           >
             <CardHeader className={`p-4`}>
               <div className="flex justify-between items-center">
-                <div className={`${category.color}`}>
-                  {category.icon}
-                </div>
-                <div className="text-3xl font-bold">
-                  {category.value}%
-                </div>
+                <div className={`${category.color}`}>{category.icon}</div>
+                <div className="text-3xl font-bold">{category.value}%</div>
               </div>
             </CardHeader>
             <CardContent className="pt-4">
@@ -78,8 +125,16 @@ export function ScoreOverview({ scores }: ScoreProps) {
                 <h4 className="font-semibold">{category.name}</h4>
                 {getStatusIcon(category.status)}
               </div>
-              <p className="text-sm text-muted-foreground">{category.description}</p>
-              <div className="w-full bg-secondary/20 rounded-full h-2 mt-4" role="progressbar" aria-valuenow={category.value} aria-valuemin={0} aria-valuemax={100}>
+              <p className="text-sm text-muted-foreground">
+                {category.description}
+              </p>
+              <div
+                className="w-full bg-secondary/20 rounded-full h-2 mt-4"
+                role="progressbar"
+                aria-valuenow={category.value}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
                 <div
                   className={`${getProgressColor(category.color)} rounded-full h-2 transition-all duration-500 ease-in-out`}
                   style={{ width: `${category.value}%` }}
@@ -133,22 +188,22 @@ function getProgressColor(textColor: string): string {
   }
 }
 
-function getScoreStatus(score: number): 'excellent' | 'good' | 'fair' | 'poor' {
-  if (score >= 90) return 'excellent';
-  if (score >= 70) return 'good';
-  if (score >= 50) return 'fair';
-  return 'poor';
+function getScoreStatus(score: number): "excellent" | "good" | "fair" | "poor" {
+  if (score >= 90) return "excellent";
+  if (score >= 70) return "good";
+  if (score >= 50) return "fair";
+  return "poor";
 }
 
-function getStatusIcon(status: 'excellent' | 'good' | 'fair' | 'poor') {
+function getStatusIcon(status: "excellent" | "good" | "fair" | "poor") {
   switch (status) {
-    case 'excellent':
+    case "excellent":
       return <CheckCircle className="h-4 w-4 ml-2 text-secondary" />;
-    case 'good':
+    case "good":
       return <CheckCircle className="h-4 w-4 ml-2 text-primary" />;
-    case 'fair':
+    case "fair":
       return <AlertTriangle className="h-4 w-4 ml-2 text-warning" />;
-    case 'poor':
+    case "poor":
       return <AlertCircle className="h-4 w-4 ml-2 text-error" />;
     default:
       return null;

@@ -1,6 +1,8 @@
 import { ScoreOverview } from "@/components/score-overview";
 import { PreviewSection } from "@/components/preview-section";
 import { AnalysisSection } from "@/components/analysis-section";
+import { StructuredDataSection } from "@/components/structured-data-section";
+import { ContentQualitySection } from "@/components/content-quality-section";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,7 +15,12 @@ interface ResultsSectionProps {
   url: string;
 }
 
-export function ResultsSection({ analysisData, isLoading, error, url }: ResultsSectionProps) {
+export function ResultsSection({
+  analysisData,
+  isLoading,
+  error,
+  url,
+}: ResultsSectionProps) {
   if (isLoading) {
     return <ResultsSkeleton />;
   }
@@ -47,14 +54,31 @@ export function ResultsSection({ analysisData, isLoading, error, url }: ResultsS
 
       <ScoreOverview scores={analysisData.scores} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <PreviewSection metaTags={analysisData.metaTags} url={analysisData.url} />
-        <AnalysisSection 
-          metaTags={analysisData.metaTags} 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <PreviewSection
+          metaTags={analysisData.metaTags}
+          url={analysisData.url}
+        />
+        <AnalysisSection
+          metaTags={analysisData.metaTags}
           recommendations={analysisData.recommendations}
           rawHtml={analysisData.rawHtml}
         />
       </div>
+
+      {/* Phase 2: Structured Data Section */}
+      {analysisData.structuredData && (
+        <div className="mb-8">
+          <StructuredDataSection structuredData={analysisData.structuredData} />
+        </div>
+      )}
+
+      {/* Phase 2: Content Quality Section */}
+      {analysisData.contentQuality && (
+        <div className="mb-8">
+          <ContentQualitySection contentQuality={analysisData.contentQuality} />
+        </div>
+      )}
     </div>
   );
 }
@@ -66,7 +90,7 @@ function ResultsSkeleton() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-6 w-32" />
       </div>
-      
+
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <Skeleton className="h-7 w-64 mb-6" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -75,7 +99,7 @@ function ResultsSkeleton() {
           ))}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">
           <Skeleton className="h-7 w-48 mb-4" />

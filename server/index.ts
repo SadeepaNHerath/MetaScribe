@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { logger } from "@shared/utils/logger";
 
 const app = express();
 app.use(express.json());
@@ -43,8 +44,16 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Log server errors for debugging
+    if (status >= 500) {
+      logger.error('Server error', err);
+    }
+
+    res.status(status).json({
+      message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+    // Fixed: Removed throw err to prevent server crash
   });
 
   // importantly only setup vite in development and after
@@ -63,7 +72,6 @@ app.use((req, res, next) => {
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });
