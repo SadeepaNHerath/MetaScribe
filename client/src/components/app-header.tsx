@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -10,11 +9,9 @@ export function AppHeader() {
         <div className="flex justify-between items-center h-16">
           <div className="flex">
             <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-              <img
-                src="/icon-192.png"
-                alt="MetaScribe Logo"
-                className="w-8 h-8"
-              />
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
+                <Search className="h-5 w-5" />
+              </div>
               <span className="font-bold text-xl text-foreground">
                 MetaScribe
               </span>

@@ -21,6 +21,61 @@ const memoryStorage = {
   }
 };
 
+function isUpstreamFetchError(message) {
+  return (
+    message.includes("Access forbidden (403)") ||
+    message.includes("Page not found (404)") ||
+    message.includes("Website not found") ||
+    message.includes("Connection refused") ||
+    message.includes("Server error (") ||
+    message.includes("Received ") ||
+    message.includes("Request timeout") ||
+    message.includes("ECONNABORTED") ||
+    message.includes("ETIMEDOUT")
+  );
+}
+
+function buildUnavailableAnalysis(url, message) {
+  return {
+    url,
+    metaTags: [],
+    scores: {
+      overall: 0,
+      requiredTags: 0,
+      socialTags: 0,
+      bestPractices: 0,
+      contentQuality: 0,
+      structuredData: 0,
+      createdAt: new Date().toISOString(),
+    },
+    recommendations: [
+      {
+        title: "Website blocked automated analysis",
+        description: `${message} This usually means the site is protected by bot/challenge security. Try another URL or analyze your own domain where crawling is allowed.`,
+        type: "warning",
+      },
+    ],
+    createdAt: new Date().toISOString(),
+    rawHtml: "",
+    structuredData: [],
+    contentQuality: {
+      headingStructure: {
+        h1Count: 0,
+        hasMultipleH1: false,
+        hierarchyValid: true,
+        outline: [],
+      },
+      images: {
+        total: 0,
+        withAlt: 0,
+        withoutAlt: 0,
+        missingAltImages: [],
+      },
+      wordCount: 0,
+    },
+  };
+}
+
 // Copy of the relevant core analyzer functions
 async function analyzeSeo(url) {
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -361,23 +416,9 @@ export default async function handler(req, res) {
     if (error instanceof Error) {
       const message = error.message;
 
-      if (
-        message.includes("Request timeout") ||
-        message.includes("ECONNABORTED") ||
-        message.includes("ETIMEDOUT")
-      ) {
-        return res.status(504).json({ message });
-      }
-
-      if (
-        message.includes("Access forbidden (403)") ||
-        message.includes("Page not found (404)") ||
-        message.includes("Website not found") ||
-        message.includes("Connection refused") ||
-        message.includes("Server error (") ||
-        message.includes("Received ")
-      ) {
-        return res.status(502).json({ message });
+      if (isUpstreamFetchError(message)) {
+        const fallbackUrl = typeof req.query.url === 'string' ? req.query.url : '';
+        return res.status(200).json(buildUnavailableAnalysis(fallbackUrl, message));
       }
 
       return res.status(400).json({ message });

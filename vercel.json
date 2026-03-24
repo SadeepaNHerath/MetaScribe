@@ -16,6 +16,7 @@
   "routes": [
     { "src": "/api/analyze", "dest": "/api/analyze.js" },
     { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/favicon.png", "dest": "/favicon-32x32.png" },
     { "src": "/favicon.svg", "dest": "/favicon.svg" },
     { "src": "/(.*)\\.(.+)", "dest": "/$1.$2" },
     { "src": "/(.*)", "dest": "/index.html" }
